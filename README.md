@@ -1,9 +1,7 @@
 LLM Hallucination & Confidence Scorer
 
 A diagnostic tool for studying confidence calibration and hallucination detection
-in text classifiers, built as an extension of the empirical evaluation in
-*Empirical Multi-Phase Evaluation of Hallucination and Confidence Consistency in
-LLMs* (ICIDSSD '26).
+in text classifiers
 
 ## What it does
 - **Claim Checker** — scores a claim as reliable / likely hallucinated, and runs
