@@ -1,52 +1,3 @@
-# 🔍 LLM Hallucination & Confidence Scorer
-
-A diagnostic tool for studying confidence calibration and hallucination
-detection, extending the empirical evaluation in *Empirical Multi-Phase
-Evaluation of Hallucination and Confidence Consistency in LLMs* (ICIDSSD '26,
-Scopus-indexed).
-
-## What this actually is (scope, stated honestly)
-
-There are two components, and the app is upfront about which is which:
-
-- An **in-house TF-IDF + neural network classifier**, trained on FEVER
-  claims, used as a controlled testbed for studying calibration and bias.
-- An **optional live query to a real LLM** (via the free Groq API) so the
-  app can compare a genuine LLM's self-reported confidence against the
-  in-house model, rather than only measuring a small custom classifier and
-  calling it "LLM hallucination detection."
-
-If no API key is configured, the app runs in classifier-only mode and says
-so in the UI — it never silently pretends to be testing an LLM when it isn't.
-
-## Features
-
-| Tab | What it shows |
-|---|---|
-| Claim Checker | In-house classifier score + self-verification shift; optional real-LLM verdict and self-reported confidence side by side |
-| Metrics | Precision / Recall / F1 / Accuracy / Confusion Matrix, **Neural Net vs. a plain Logistic Regression baseline**, and a **bootstrap 95% confidence interval** for accuracy |
-| Calibration | Expected Calibration Error (ECE) and a reliability diagram |
-| Calibration Fix | Post-hoc **temperature scaling** (Guo et al., 2017), reporting honestly whether it helped or didn't |
-| Bias Detection | Accuracy broken down by topical domain |
-| Explainability | SHAP KernelExplainer — top tokens driving a given prediction |
-| RAG Groundedness | Retrieves real Wikipedia evidence for a claim and compares a **closed-book LLM verdict vs. a RAG-grounded verdict** (answer using only the retrieved evidence) — tests whether retrieval actually changes/reduces hallucinated answers |
-| Self-Verification Cascade | Extends the single-round self-verification finding: repeatedly re-verifies the claim and tracks how far confidence drifts over multiple rounds |
-| Selective Prediction | Risk-coverage curve — checks whether confidence, even if miscalibrated in absolute terms, is still useful for deciding *when* to trust the model (abstaining below a threshold) |
-| Robustness | Paraphrase consistency (same fact, different wording — does the verdict flip?) and a hallucination error taxonomy (negation / numeric-date / other surface patterns among misclassified claims) |
-
-## Architecture
-
-```
-model_utils.py       # core logic: data, model, metrics, calibration, cascade,
-                      # selective prediction, paraphrase check, error taxonomy — no Streamlit import
-retrieval_utils.py    # Wikipedia RAG retrieval + lexical grounding score — no Streamlit import
-llm_client.py         # optional Groq API wrapper (closed-book + RAG-grounded verdicts),
-                       # degrades gracefully with no key
-app.py                # Streamlit UI, imports the three modules above
-tests/                 # pytest unit tests against model_utils and retrieval_utils
-.github/workflows/tests.yml   # CI: runs the test suite on every push
-```
-
 Logic is deliberately separated from the UI so it can be unit-tested and
 reused outside Streamlit (e.g. a notebook or CLI).
 
@@ -114,4 +65,3 @@ Python, PyTorch, Scikit-learn, SHAP, SciPy, Streamlit, Groq API, FEVER Dataset
 
 ## License
 MIT — see `LICENSE`.
-
